@@ -22,7 +22,7 @@ exports.login = async (req,res)=>{
             delete already.password;
 
 
-            return res.send({message: 'Welcome', already, token});
+            return res.send({message: 'Welcome to FitApp', already, token});
         }else return res.status(401).send({message: 'Invalid Credentials'});
 
     }catch(err){
@@ -50,13 +50,17 @@ exports.register = async(req,res)=>{
         data.surname = params.surname;
         data.phone = params.phone;
         data.age = params.age;
+        data.gender = params.gender;
         data.height = params.height;
         data.weight = params.weight;
         data.password = await encrypt(params.password);
 
+        if(data.age <18)
+        return res.status(400).send({message: 'You are not of legal age'})
+
         let user = new User(data);
         await user.save();
-        return res.send({message: 'User created successfully', user});
+        return res.send({message: 'Congragulations', user});
 
     }catch(err){
         console.log(err)
