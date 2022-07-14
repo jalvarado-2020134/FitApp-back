@@ -12,6 +12,7 @@ const userSchema = mongoose.Schema({
     password: String,
     phone: String,
     role: String,
+    image: String,
     height: String,
     weight:String
 });
