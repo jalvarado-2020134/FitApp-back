@@ -57,7 +57,11 @@ exports.register = async(req,res)=>{
         data.password = await encrypt(params.password);
 
         if(data.age <18)
-        return res.status(400).send({message: 'You are not of legal age'})
+        return res.status(400).send({message: 'The user is not of legal age'})
+
+
+        if(data.age >90)
+        return res.status(400).send({message: 'Your age is to high to be in FITAPP'})
 
         let user = new User(data);
         await user.save();
@@ -125,7 +129,11 @@ exports.addUser = async(req,res)=>{
         };
 
         if(data.age <18)
-        return res.status(400).send({message: 'You are not of legal age'})
+        return res.status(400).send({message: 'The user is not of legal age'})
+
+
+        if(data.age >90)
+        return res.status(400).send({message: 'Your age is to high to be in FITAPP'})
 
         const msg = validateData(data);
         if(msg) return res.status(400).send(msg);
@@ -153,6 +161,19 @@ exports.update_Admin = async(req,res)=>{
     try{
         const userId = req.params.id;
         const params = req.body;
+
+        const data={
+            age: params.age
+        }
+
+        if(data.age <18)
+        return res.status(400).send({message: 'The user is not of legal age'})
+
+
+        if(data.age >90)
+        return res.status(400).send({message: 'Your age is to high to be in FITAPP'})
+
+
 
         
 
