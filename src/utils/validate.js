@@ -116,9 +116,9 @@ exports.alreadyUser = async (username)=>{
 
  /*-----------------------------------*/
 
- exports.alreadyFood = async ( client , name)=>{
+ exports.alreadyFood = async ( client ,breakfast,lunch,dinner)=>{
     try{
-     let exist = Food.findOne({  client:client , name:name}).lean()
+     let exist = Food.findOne({  client:client , lunch:lunch, breakfast:breakfast, dinner:dinner }).lean()
      return exist;
     }catch(err){
         return err;

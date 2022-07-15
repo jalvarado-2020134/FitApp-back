@@ -1,11 +1,11 @@
 'use strict'
 
-const User =require('../models/user.model');
+const User = require('../models/user.model');
 const Food = require('../models/food.model');
-const {validateData, alreadyFood, checkUpdate, alreadyFoodUpdated}=require('../utils/validate');
+const { validateData, alreadyFood, checkUpdate, alreadyFoodUpdated } = require('../utils/validate');
 
-exports.newFood = async(req,res)=>{
-    try{
+exports.newFood = async (req, res) => {
+    try {
         const params = req.body;
         const data = {
             name: params.name,
@@ -20,98 +20,102 @@ exports.newFood = async(req,res)=>{
         };
 
         const msg = validateData(data);
-        if(!msg){
-            let foodExist = await alreadyFood(data.client, data.name);
-            if(foodExist) return res.status(400).send({message: 'Food already exist'});
-            const check = await User.findOne({_id: data.client});
-            if(check === null || check._id != data.client)
-            return res.send({message: 'User not found'})
+        if (!msg) {
+            let foodExist = await alreadyFood(data.client,  data.lunch );
+            if (foodExist) return res.status(400).send({ message: 'The user already eat that this week' });
+            let breakExist = await alreadyFood(data.client, data.breakfast);
+            if (breakExist) return res.status(400).send({ message: 'The user already eat that for breakfast this week' });
+            let dinnerExist = await alreadyFood(data.client, data.dinner);
+            if (dinnerExist) return res.status(400).send({ message: 'The user already eat that for dinner this week' });
+            const check = await User.findOne({ _id: data.client });
+            if (check === null || check._id != data.client)
+                return res.send({ message: 'User not found' })
             console.log(check);
 
-            const foodAlready = await Food.findOne({$and:[{name:data.name},{client: data.client}]});
-            if(foodAlready) return res.send({message: 'Food exists'});
+            const foodAlready = await Food.findOne({ $and: [{ name: data.name }, { client: data.client },{week: data.week},{day: data.day}] });
+            if (foodAlready) return res.send({ message: 'The CLIENT already had his recipe for this day' });
             const food = new Food(data);
             await food.save();
-            return res.send({message: 'Food saved successfully', food})
-        }else return res.status(400).send(msg);
-    }catch(err){
+            return res.send({ message: 'Recipe saved successfully', food })
+        } else return res.status(400).send(msg);
+    } catch (err) {
         console.log(err)
         return err;
     }
 }
 
-exports.updateFood = async(req,res)=>{
-    try{
+exports.updateFood = async (req, res) => {
+    try {
         const foodId = req.params.id;
         const params = req.body;
 
-        const foodExist = await Food.findOne({_id: foodId});
-        if(!foodExist) return res.send({message: 'Food not found'});
+        const foodExist = await Food.findOne({ _id: foodId });
+        if (!foodExist) return res.send({ message: 'Food not found' });
 
         const validateUpdate = await checkUpdate(params);
-        if(validateUpdate === false) return res.status(400).send({message: 'Invalid params'});
+        if (validateUpdate === false) return res.status(400).send({ message: 'Invalid params' });
 
-        const foodUpdate = await Food.findOneAndUpdate({_id: foodId}, params,{new:true});
-        if(!foodUpdate) return res.send({message: 'Food not updated'});
-        return res.send({message: 'Food updated successfully', foodUpdate});
+        const foodUpdate = await Food.findOneAndUpdate({ _id: foodId }, params, { new: true });
+        if (!foodUpdate) return res.send({ message: 'Food not updated' });
+        return res.send({ message: 'Recipe updated successfully', foodUpdate });
 
-    }catch(err){
+    } catch (err) {
         console.log(err)
         return err;
     }
 }
 
-exports.deleteFood = async(req,res)=>{
-    try{
+exports.deleteFood = async (req, res) => {
+    try {
         const foodId = req.params.id;
 
-        const foodExist = await Food.findOne({_id: foodId});
-        if(!foodExist) return res.send({message: 'Food not found'});
+        const foodExist = await Food.findOne({ _id: foodId });
+        if (!foodExist) return res.send({ message: 'Food not found' });
 
-        const deleteFood = await Food.findOneAndDelete({_id: foodId});
-        if(!deleteFood) return res.status(400).send({message: 'Food not deleted'});
-        return res.send({message: 'Food', deleteFood});
+        const deleteFood = await Food.findOneAndDelete({ _id: foodId });
+        if (!deleteFood) return res.status(400).send({ message: 'Food not deleted' });
+        return res.send({ message: 'Recipe', deleteFood });
 
-    }catch(err){
+    } catch (err) {
         console.log(err)
         return err;
     }
 }
 
-exports.getFood = async(req,res)=>{
-    try{
+exports.getFood = async (req, res) => {
+    try {
         const foodId = req.params.id;
-        const food = await Food.findOne({_id: foodId});
-        if(!food) return res.send({message: 'Food not found'});
-        return res.send({message: 'Food found', food})
-    }catch(err){
+        const food = await Food.findOne({ _id: foodId });
+        if (!food) return res.send({ message: 'Food not found' });
+        return res.send({ message: 'Food found', food })
+    } catch (err) {
         console.log(err)
         return err;
     }
 }
 
-exports.getFoods = async(req,res)=>{
-    try{
+exports.getFoods = async (req, res) => {
+    try {
         const foods = await Food.find().populate('client')
-        return res.send({message: 'Foods found', foods});
-    }catch(err){
+        return res.send({ message: 'Foods found', foods });
+    } catch (err) {
         console.log(err)
         return err;
     }
 }
 
-exports.foodByWeek = async(req,res)=>{
-    try{
+exports.foodByWeek = async (req, res) => {
+    try {
         const params = req.body;
-        const data={
+        const data = {
             week: params.week
         };
 
         const msg = validateData(data);
-        if(msg)return res.status(400).send(msg);
-        const foods = await Food.find({week:{$regex: params.week, $options: 'i'}}).lean();
-        return res.send({message: 'Foods found', foods});
-    }catch(err){
+        if (msg) return res.status(400).send(msg);
+        const foods = await Food.find({ week: { $regex: params.week, $options: 'i' } }).lean();
+        return res.send({ message: 'Foods found', foods });
+    } catch (err) {
         console.log(err)
         return err;
     }
