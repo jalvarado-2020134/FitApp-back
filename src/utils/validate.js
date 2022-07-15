@@ -2,6 +2,7 @@
 
 const bcrypt = require('bcrypt-nodejs');
 const User = require('../models/user.model');
+const Food = require('../models/food.model')
 
 exports.validateData = (data)=>{
     let keys = Object.keys(data), msg='';
@@ -112,3 +113,23 @@ exports.alreadyUser = async (username)=>{
          return err; 
      }
  }
+
+ /*-----------------------------------*/
+
+ exports.alreadyFood = async ( client , name)=>{
+    try{
+     let exist = Food.findOne({  client:client , name:name}).lean()
+     return exist;
+    }catch(err){
+        return err;
+    }
+}
+
+exports.alreadyFoodUpdated = async ( name)=>{
+    try{
+     let exist = Food.findOne({ name:name}).lean()
+     return exist;
+    }catch(err){
+        return err;
+    }
+}
