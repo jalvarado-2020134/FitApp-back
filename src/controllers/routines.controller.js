@@ -2,7 +2,7 @@
 
 const User = require('../models/user.model');
 const Routine = require('../models/routines.model');
-const {validateData, alreadyRoutine, checkUpdate, alreadyRoutineUpdated} = require('../utils/validate');
+const {validateData, alreadyRoutine, checkUpdateRoutine, alreadyRoutineUpdated} = require('../utils/validate');
 
 exports.newRoutine = async(req,res)=>{
     try{
@@ -18,6 +18,12 @@ exports.newRoutine = async(req,res)=>{
             complete: false,
             client: params.client
         };
+
+        if(data.priority <1)
+        return res.status(400).send({message: 'The range of priority is 1-10'})
+
+        if(data.priority >10)
+        return res.status(400).send({message: 'The range of priority is 1-10'})
 
         const msg = validateData(data);
         if(msg) return res.status(400).send(msg);
@@ -44,15 +50,24 @@ exports.updateRoutine = async(req,res)=>{
         const routineId = req.params.id;
         const params = req.body;
 
+
+        const data={
+            priority: params.priority
+        }
+
+        if(data.priority <1)
+        return res.status(400).send({message: 'The range of priority is 1-10'})
+
+        if(data.priority >10)
+        return res.status(400).send({message: 'The range of priority is 1-10'})
+
         const routineExist = await Routine.findOne({_id: routineId});
         if(!routineExist) return res.send({message: 'Routine not found'});
 
-        const validateUpdate = await checkUpdate(params);
-        if(validateUpdate === false) return res.status(400).send({message: 'Invalid params'});
-
-        const routineUpdate = await Routine.findOneAndUpdate({_id: routineId}, params,{new:true});
-        if(!routineUpdate) return res.send({message: 'Routine not updated'})
-        return res.send({message: 'Routine updated successfully', routineUpdate});
+        const routineUpdate = await checkUpdateRoutine(params);
+        if(!routineUpdate) return res.status(400).send({message: 'Invalid params'});
+        await Routine.findOneAndUpdate({_id: routineId},params);
+        return res.send({message: 'Routine updated successfully'});
     }catch(err){
         console.log(err)
         return err;

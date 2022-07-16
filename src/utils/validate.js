@@ -3,6 +3,7 @@
 const bcrypt = require('bcrypt-nodejs');
 const User = require('../models/user.model');
 const Food = require('../models/food.model')
+const Routine = require('../models/routines.model');
 
 exports.validateData = (data)=>{
     let keys = Object.keys(data), msg='';
@@ -90,6 +91,15 @@ exports.alreadyUser = async (username)=>{
      }else{
          return true;
      }
+ }
+
+ exports.checkUpdateRoutine = async(data)=>{
+    try{
+        if(Object.entries(data).length === 0) return false;
+        else return true;
+    }catch(err){
+        console.log(err)
+    }
  }
  
  exports.checkUpdateManager = async (user)=>{
