@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt-nodejs');
 const User = require('../models/user.model');
 const Food = require('../models/food.model')
 const Routine = require('../models/routines.model');
+const Restaurant = require('../models/restaurant.model');
 
 exports.validateData = (data)=>{
     let keys = Object.keys(data), msg='';
@@ -101,6 +102,8 @@ exports.alreadyUser = async (username)=>{
         console.log(err)
     }
  }
+
+ 
  
  exports.checkUpdateManager = async (user)=>{
      if(user.password || Object.entries(user).length === 0){

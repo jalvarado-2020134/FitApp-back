@@ -7,6 +7,7 @@ const cors = require('cors');
 const userRoutes = require('../src/routes/user.routes');
 const foodRoutes = require('../src/routes/food.routes');
 const routineRoutes = require('../src/routes/routines.routes');
+const restaurantRoutes = require('../src/routes/restaurant.routes');
 
 const app = express(); //instancia
 
@@ -17,5 +18,6 @@ app.use(cors());
 app.use('/user', userRoutes);
 app.use('/food', foodRoutes);
 app.use('/routine', routineRoutes);
+app.use('/restaurant', restaurantRoutes);
 
 module.exports = app;
