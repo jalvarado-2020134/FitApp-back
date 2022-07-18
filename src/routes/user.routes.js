@@ -20,6 +20,8 @@ api.post('/search',[mdAuth.ensureAuth],userController.searchUser);
 api.get('/myUser', mdAuth.ensureAuth, userController.myUser);
 api.post('/uploadImage/:id',[mdAuth.ensureAuth, upload],userController.uploadImage);
 api.get('/getImage/:fileName', upload, userController.getImage);
+api.get('/getClients', [mdAuth.ensureAuth,], userController.getClients);
+
 
 module.exports = api;
 

@@ -325,3 +325,13 @@ exports.getImage = async (req,res)=>{
         return err;
     }
 }
+
+exports.getClients = async(req,res)=>{
+    try{
+        const usersExist = await User.find({role: 'CLIENT'});
+        return res.send({message: 'CLIENTS', usersExist})
+    }catch(err){
+        console.log(err)
+        return err;
+    }
+}

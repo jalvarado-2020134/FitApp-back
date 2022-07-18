@@ -1,5 +1,6 @@
 'use strict'
 
+const User = require('../models/user.model')
 const Restaurant = require('../models/restaurant.model');
 const {validateData, alreadyUser, checkUpdateRoutine} = require('../utils/validate');
 
@@ -14,7 +15,8 @@ exports.saveRestaurant = async(req,res)=>{
             open: params.open,
             close: params.close,
             phone: params.phone,
-            calification: params.calification
+            calification: params.calification,
+            client: params.client
         };
 
         const msg = validateData(data);
@@ -42,7 +44,7 @@ exports.updateRestaurant = async(req,res)=>{
         if(!restaurantExist) return res.send({message: 'Restaurant not found'});
 
         const validateUpdate = await checkUpdateRoutine(params);
-        if(validate === false) return res.status(400).send({message: 'Invalid params'});
+        if(validateUpdate === false) return res.status(400).send({message: 'Invalid params'});
 
         const restaurantUpdate = await Restaurant.findOneAndUpdate({_id: restaurantId}, params,{new:true});
         if(!restaurantUpdate) return res.send({message: 'Restaurant not updated'});
@@ -83,7 +85,7 @@ exports.getRestaurant = async(req,res)=>{
 
 exports.getRestaurants = async(req,res)=>{
     try{
-        const restaurants = await Restaurant.find();
+        const restaurants = await Restaurant.find().populate('client')
         return res.send({message: 'Restaurant found', restaurants});
     }catch(err){
         console.log(err)
